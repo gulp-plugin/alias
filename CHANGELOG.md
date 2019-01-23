@@ -5,6 +5,10 @@ This file uses change log convention from [Keep a CHANGELOG].
 
 ## [Unreleased]
 
+## [0.1.1] - 2019-01-23
+### Changed
+- Lock `event-stream` to `3.3.4` under the recommendation of GitHub
+
 ## 0.1.0 - 2019-01-23
 ### Added
 - Initial commit.
@@ -12,4 +16,5 @@ This file uses change log convention from [Keep a CHANGELOG].
 [Keep a CHANGELOG]: http://keepachangelog.com
 [Semantic Versioning]: http://semver.org/
 
-[unreleased]: https://github.com/dhkatz/gulp-ts-alias/compare/0.1.0...HEAD
+[unreleased]: https://github.com/dhkatz/gulp-ts-alias/compare/0.1.1...HEAD
+[0.1.1]: https://github.com/dhkatz/gulp-ts-alias/compare/0.1.0...0.1.1
