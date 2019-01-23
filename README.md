@@ -2,6 +2,8 @@
 
 Resolve TypeScript import aliases and paths defined in `tsconfig`.
 
+![](https://img.shields.io/npm/v/gulp-ts-alias.svg) ![](https://img.shields.io/npm/dm/gulp-ts-alias.svg)
+
 ## Install
 
 `npm install --save-dev gulp-ts-alias`
