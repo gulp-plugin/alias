@@ -123,8 +123,6 @@ function resolveImports(file: ReadonlyArray<string>, imports: FileData[], option
       relative = './' + relative;
     }
 
-    console.log(line.replace(imported.import, relative));
-
     lines[imported.index] = line.replace(imported.import, relative);
   }
 
@@ -135,8 +133,6 @@ const aliasPlugin: AliasPlugin = (pluginOptions: PluginOptions) => {
   if (!pluginOptions.configuration) {
     // tslint:disable-next-line:max-line-length
     throw new PluginError('gulp-ts-alias', 'The \"configuration\" option cannot be empty. Provide the tsconfig or compilerOptions object.');
-  } else {
-    console.log(pluginOptions.configuration);
   }
 
   // tslint:disable-next-line:max-line-length

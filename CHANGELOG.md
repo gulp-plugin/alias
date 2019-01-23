@@ -5,6 +5,10 @@ This file uses change log convention from [Keep a CHANGELOG].
 
 ## [Unreleased]
 
+## [0.1.3] - 2019-01-23
+### Removed
+- Remove a `console.log` line that was used for debugging
+
 ## [0.1.2] - 2019-01-23
 ### Fixed
 - Fix `event-stream` dependency in both `package.json` and `package-lock.json` files
@@ -20,6 +24,7 @@ This file uses change log convention from [Keep a CHANGELOG].
 [Keep a CHANGELOG]: http://keepachangelog.com
 [Semantic Versioning]: http://semver.org/
 
-[unreleased]: https://github.com/dhkatz/gulp-ts-alias/compare/0.1.2...HEAD
+[unreleased]: https://github.com/dhkatz/gulp-ts-alias/compare/0.1.3...HEAD
+[0.1.3]: https://github.com/dhkatz/gulp-ts-alias/compare/0.1.2...0.1.3
 [0.1.2]: https://github.com/dhkatz/gulp-ts-alias/compare/0.1.1...0.1.2
 [0.1.1]: https://github.com/dhkatz/gulp-ts-alias/compare/0.1.0...0.1.1
