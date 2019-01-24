@@ -37,7 +37,7 @@
     "@types/jest": "^23.3.12",
     "@types/vinyl": "^2.0.2",
     "del": "^3.0.0",
-    "event-stream": "^3.3.4",
+    "event-stream": "^4.0.1",
     "gulp": "^4.0.0",
     "gulp-jest": "^4.0.2",
     "gulp-sourcemaps": "^2.6.4",
