@@ -8,8 +8,8 @@
     "lib/"
   ],
   "scripts": {
-    "test": "gulp build",
-    "prepublishOnly": "gulp build"
+    "test": "gulp test",
+    "prepublishOnly": "gulp test"
   },
   "author": {
     "name": "David Katz",

@@ -18,8 +18,8 @@ const run = (test: TestCase): void => {
   const input = new File({ contents: Buffer.from(test.input), path: test.path });
 
   Stream.readArray([input])
-    // .pipe(plugin(test.pluginOptions))
-    .pipe(Stream.map((file: File, cb: (error: any, file?: any) => void) => {
+    .pipe(plugin(test.pluginOptions))
+    .pipe(Stream.mapSync((file: File, cb: (error: any, file?: any) => void) => {
       const contents: Buffer | NodeJS.ReadableStream | null = file.contents;
 
       if (contents === null) {
@@ -29,27 +29,6 @@ const run = (test: TestCase): void => {
       console.log(contents.toString());
   }));
 };
-
-// it('should pass with compiler options', (done: jest.DoneCallback) => {
-//   run({
-//     pluginOptions: { configuration: compilerOptions },
-//     path: './src/FileFolder/InnerFileFolder/File.ts',
-//     input: `
-//     import A from './asdf';
-//     import B from './MyAlias';
-//     import C from 'MyAlias';
-//     import D from 'express';
-//     `,
-//     expected: `
-//     import A from './asdf';
-//     import B from './MyAlias';
-//     import C from '../../MyAliasFolder/MyAliasClass';
-//     import D from 'express';
-//     `,
-//   });
-
-//   done();
-// });
 
 it('should throw with no config', (done) => {
   let error;
@@ -63,32 +42,32 @@ it('should throw with no config', (done) => {
     });
   } catch (e) {
     error = e;
-  } finally {
-    if (!(error instanceof PluginError)) {
-      fail('Test should have failed but did not!');
-    }
-
-    done();
   }
+
+  if (!(error instanceof PluginError)) {
+    fail('Test should have failed but did not!');
+  }
+
+  done();
 });
 
-// it('should throw with no path', (done: jest.DoneCallback) => {
-//   let error;
+it('should throw with no path', (done: jest.DoneCallback) => {
+  let error;
 
-//   try {
-//     run({
-//       pluginOptions: { configuration: compilerOptions },
-//       path: undefined,
-//       input: '',
-//       expected: '',
-//     });
-//   } catch (e) {
-//     error = e;
-//   } finally {
-//     if (!(error instanceof PluginError)) {
-//       fail('Test should have failed but did not!');
-//     }
+  try {
+    run({
+      pluginOptions: { configuration: compilerOptions },
+      path: undefined,
+      input: '',
+      expected: '',
+    });
+  } catch (e) {
+    error = e;
+  }
 
-//     done();
-//   }
-// });
+  if (!(error instanceof PluginError)) {
+    fail('Test should have failed but did not!');
+  }
+
+  done();
+});

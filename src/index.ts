@@ -117,9 +117,7 @@ function resolveImports(file: ReadonlyArray<string>, imports: FileData[], option
     relative = path.relative(path.dirname(imported.path), path.resolve(path.dirname(imported.path), relative));
     relative = relative.replace(/\\/g, '/');
 
-    if (relative.length === 0) {
-      relative = './';
-    } else if (!relative.startsWith('.')) {
+    if (relative.length === 0 || !relative.startsWith('.')) {
       relative = './' + relative;
     }
 
@@ -130,7 +128,7 @@ function resolveImports(file: ReadonlyArray<string>, imports: FileData[], option
 }
 
 const aliasPlugin: AliasPlugin = (pluginOptions: PluginOptions) => {
-  if (!pluginOptions.configuration) {
+  if (pluginOptions.configuration === undefined || pluginOptions.configuration === null) {
     // tslint:disable-next-line:max-line-length
     throw new PluginError('gulp-ts-alias', 'The \"configuration\" option cannot be empty. Provide the tsconfig or compilerOptions object.');
   }
@@ -138,7 +136,7 @@ const aliasPlugin: AliasPlugin = (pluginOptions: PluginOptions) => {
   // tslint:disable-next-line:max-line-length
   const compilerOptions: CompilerOptions = (pluginOptions.configuration as TSConfig).compilerOptions || pluginOptions.configuration as CompilerOptions;
 
-  if (!compilerOptions.paths) {
+  if (typeof compilerOptions.paths !== 'string' && !(compilerOptions.paths instanceof String)) {
     throw new PluginError('gulp-ts-alias', 'Unable to find the \"paths\" property in the supplied configuration!');
   }
 
@@ -177,6 +175,3 @@ const aliasPlugin: AliasPlugin = (pluginOptions: PluginOptions) => {
 };
 
 export default aliasPlugin;
-
-module.exports.default = aliasPlugin;
-module.exports = aliasPlugin;
