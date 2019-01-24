@@ -136,7 +136,7 @@ const aliasPlugin: AliasPlugin = (pluginOptions: PluginOptions) => {
   // tslint:disable-next-line:max-line-length
   const compilerOptions: CompilerOptions = (pluginOptions.configuration as TSConfig).compilerOptions || pluginOptions.configuration as CompilerOptions;
 
-  if (typeof compilerOptions.paths !== 'string' && !(compilerOptions.paths instanceof String)) {
+  if (compilerOptions.paths === undefined || compilerOptions.paths === null) {
     throw new PluginError('gulp-ts-alias', 'Unable to find the \"paths\" property in the supplied configuration!');
   }
 
