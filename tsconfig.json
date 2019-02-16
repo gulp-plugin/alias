@@ -2,6 +2,7 @@
   "compilerOptions": {
     "target": "es2017",
     "module": "commonjs",
+    "moduleResolution": "node",
 
     "outDir": "./build",
     "rootDir": "./src",
@@ -9,10 +10,13 @@
     "declaration": true,
     "strict": true,
     "sourceMap": true,
+
     "noImplicitAny": true,
     "alwaysStrict": true,
+
     "typeRoots": ["./node_modules/@types"],
-    "resolveJsonModule": true
+    "resolveJsonModule": true,
+    "removeComments": true
   },
   "exclude": [
     "./build/*",

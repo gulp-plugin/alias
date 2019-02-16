@@ -3,13 +3,13 @@
   "version": "0.1.5",
   "description": "Use Gulp to resolve Typescript path aliases during compilation.",
   "main": "./lib/index.js",
-  "typings": "./lib/index.d.ts",
+  "types": "./lib/index.d.ts",
   "files": [
     "lib/"
   ],
   "scripts": {
     "test": "gulp test",
-    "prepublishOnly": "gulp test"
+    "prepublishOnly": "gulp build"
   },
   "author": {
     "name": "David Katz",

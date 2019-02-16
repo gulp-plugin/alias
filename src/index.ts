@@ -27,7 +27,7 @@ export interface PluginOptions {
 
 export type AliasPlugin = (pluginOptions: PluginOptions) => any;
 
-function parseImports(file: string[], dir: string): FileData[] {
+function parseImports(file: ReadonlyArray<string>, dir: string): FileData[] {
   const results = file.map((line: string, index: number) => {
     const imports = findImport(line);
 
@@ -175,3 +175,7 @@ const aliasPlugin: AliasPlugin = (pluginOptions: PluginOptions) => {
 };
 
 export default aliasPlugin;
+
+// ES5/ES6 fallbacks
+module.exports = aliasPlugin;
+module.exports.default = aliasPlugin;

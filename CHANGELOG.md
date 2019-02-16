@@ -5,6 +5,13 @@ This file uses change log convention from [Keep a CHANGELOG].
 
 ## [Unreleased]
 
+# [0.2.0] - 2019-02-16
+### Changed
+- Change some types to be more restrictive
+- Strip comments from compiled Javascript
+### Fixed
+- Fix module exporting for ES5/ES6 users by specifying `module.exports`
+
 ## [0.1.5] - 2019-01-23
 ### Fixed
 - Fixed introduced bug
@@ -32,7 +39,8 @@ This file uses change log convention from [Keep a CHANGELOG].
 [Keep a CHANGELOG]: http://keepachangelog.com
 [Semantic Versioning]: http://semver.org/
 
-[unreleased]: https://github.com/dhkatz/gulp-ts-alias/compare/0.1.5...HEAD
+[unreleased]: https://github.com/dhkatz/gulp-ts-alias/compare/0.2.0...HEAD
+[0.2.0]: https://github.com/dhkatz/gulp-ts-alias/compare/0.1.5...0.2.0
 [0.1.5]: https://github.com/dhkatz/gulp-ts-alias/compare/0.1.4...0.1.5
 [0.1.4]: https://github.com/dhkatz/gulp-ts-alias/compare/0.1.3...0.1.4
 [0.1.3]: https://github.com/dhkatz/gulp-ts-alias/compare/0.1.2...0.1.3
