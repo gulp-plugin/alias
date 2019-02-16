@@ -5,7 +5,7 @@ This file uses change log convention from [Keep a CHANGELOG].
 
 ## [Unreleased]
 
-# [0.2.0] - 2019-02-16
+## [0.2.0] - 2019-02-16
 ### Changed
 - Change some types to be more restrictive
 - Strip comments from compiled Javascript
