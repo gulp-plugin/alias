@@ -8,6 +8,15 @@ Resolve TypeScript import aliases and paths defined in `tsconfig`.
 
 `npm install --save-dev gulp-ts-alias`
 
+## Information
+
+There have been previous attempts at releasing Gulp plugins that accomplish something similar, but all have become unmaintained.
+
+For legacy sake, here is a list of previous packages/scripts that have been considered:
+
+[gulp-ts-paths](https://www.npmjs.com/package/gulp-ts-paths)
+[path-alias-resolver](https://gist.github.com/azarus/f369ee2ab0283ba0793b0ccf0e9ec590)
+
 ## Usage
 
 ```javascript
@@ -52,7 +61,7 @@ import express from 'express';
 
 import A from './file'; // Normal relative import
 
-// Aliased import, resolves to some relative path to /src/components
+// Aliased import, resolves to some relative path to rootDir
 import B from '@/components';
 ```
 
@@ -64,5 +73,6 @@ import express from 'express';
 import A from './file';
 
 // gulp-ts-alias finds the correct relative path
+// and replaces it before compilation
 import B from '../../components';
 ```
