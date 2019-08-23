@@ -7,6 +7,7 @@
   "files": [
     "lib/",
     "typings/",
+    "src/",
     "test/"
   ],
   "scripts": {
@@ -17,7 +18,7 @@
     "test": "./node_modules/.bin/jest --ci --verbose --forceExit --detectOpenHandles",
     "test:coverage": "./node_modules/.bin/jest --coverage --ci",
     "coverage": "./node_modules/.bin/jest --coverage && cat ./coverage/lcov.info | ./node_modules/.bin/coveralls",
-    "prepublishOnly": "gulp build"
+    "prepublishOnly": "npm run build"
   },
   "author": {
     "name": "David Katz",
