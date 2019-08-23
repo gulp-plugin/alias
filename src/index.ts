@@ -1,7 +1,8 @@
-import * as path from 'path';
+import path from 'path';
 
-import * as PluginError from 'plugin-error';
-import * as File from 'vinyl';
+import PluginError from 'plugin-error';
+
+import File = require('vinyl');
 
 // @ts-ignore
 import * as map from 'map-stream';
@@ -72,7 +73,7 @@ function resolveImports(file: ReadonlyArray<string>, imports: FileData[], option
 
     let resolved = alias;
     if (alias.endsWith('/*')) {
-        resolved = alias.replace('/*', '/');
+      resolved = alias.replace('/*', '/');
     }
 
     aliases[resolved] = paths[alias];
