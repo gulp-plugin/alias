@@ -69,16 +69,15 @@ function resolveImports(file: ReadonlyArray<string>, imports: FileData[], option
 
   const aliases: { [key: string]: string[] | undefined } = {};
   for (const alias in paths) {
-    if (!paths.hasOwnProperty(alias)) {
-      continue;
-    }
+    /* istanbul ignore else  */
+    if (paths.hasOwnProperty(alias)) {
+      let resolved = alias;
+      if (alias.endsWith('/*')) {
+        resolved = alias.replace('/*', '/');
+      }
 
-    let resolved = alias;
-    if (alias.endsWith('/*')) {
-      resolved = alias.replace('/*', '/');
+      aliases[resolved] = paths[alias];
     }
-
-    aliases[resolved] = paths[alias];
   }
 
   const lines: string[] = [...file];
@@ -87,28 +86,21 @@ function resolveImports(file: ReadonlyArray<string>, imports: FileData[], option
 
     let resolved: string = '';
     for (const alias in aliases) {
-      if (!aliases.hasOwnProperty(alias)) {
-        continue;
-      }
+      /* istanbul ignore else  */
+      if (aliases.hasOwnProperty(alias) && imported.import.startsWith(alias)) {
+        const choices: string[] | undefined = aliases[alias];
 
-      if (!imported.import.startsWith(alias)) {
-        continue;
-      }
+        if (choices != undefined) {
+          resolved = choices[0];
+          if (resolved.endsWith('/*')) {
+            resolved = resolved.replace('/*', '/');
+          }
 
-      const choices: string[] | undefined = aliases[alias];
+          resolved = imported.import.replace(alias, resolved);
 
-      if (choices !== undefined && choices !== null) {
-        resolved = choices[0];
-        if (resolved.endsWith('/*')) {
-          resolved = resolved.replace('/*', '/');
+          break;
         }
-
-        resolved = imported.import.replace(alias, resolved);
-      } else {
-        continue;
       }
-
-      break;
     }
 
     if (resolved.length < 1) {

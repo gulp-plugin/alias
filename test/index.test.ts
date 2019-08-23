@@ -15,7 +15,7 @@ const compilerOptions: CompilerOptions = { paths: { 'MyAlias': ['MyAliasFolder/M
 
 const run = async (test: TestCase): Promise<void> => {
   return new Promise<void>((resolve, reject) => {
-    const input = new File({ contents: Buffer.from(test.input), path: test.path });
+    const input = new File({ contents: test.input == null ? null : Buffer.from(test.input), path: test.path });
     const stream = ObjectStream.fromArray([input]);
 
     stream
@@ -23,7 +23,7 @@ const run = async (test: TestCase): Promise<void> => {
       .pipe(ObjectStream.transform({
         onEntered: (args: EnteredArgs<File, void>) => {
           try {
-            expect(args.object.contents.toString()).toEqual(test.expected);
+            expect(args.object.contents ? args.object.contents.toString() : args.object.contents).toEqual(test.expected);
           } catch (error) {
             reject(error);
           }
@@ -69,6 +69,23 @@ import C from "../../MyAliasFolder/MyAliasClass";
   });
 });
 
+it('should work with no baseUrl', async () => {
+  return run({
+    pluginOptions: { configuration: { paths: { 'MyAlias': ['MyAliasFolder/MyAliasClass'] } } },
+    path: './src/FileFolder/InnerFileFolder/File.ts',
+    input: `
+import A from "./asdf";
+import B from "./MyAlias";
+import C from "MyAlias";
+`,
+    expected: `
+import A from "./asdf";
+import B from "./MyAlias";
+import C from "../../../MyAliasFolder/MyAliasClass";
+`
+  });
+});
+
 it('should support dynamic imports', async () => {
   return run({
     pluginOptions: { configuration: compilerOptions },
@@ -99,6 +116,41 @@ const C = require("../../MyAliasFolder/MyAliasClass");
   });
 });
 
+it('should pass files with no import aliases', async () => {
+  return run({
+    pluginOptions: { configuration: compilerOptions },
+    path: './src/FileFolder/InnerFileFolder/File.ts',
+    input: `
+const A = require("./asdf");
+const B = require("./MyAlias");
+const C = require("test");
+`,
+    expected: `
+const A = require("./asdf");
+const B = require("./MyAlias");
+const C = require("test");
+`
+  });
+});
+
+it('should pass empty files', async () => {
+  return run({
+    pluginOptions: { configuration: compilerOptions },
+    path: './src/FileFolder/InnerFileFolder/File.ts',
+    input: '',
+    expected: ''
+  });
+});
+
+it('should pass null files', async () => {
+  return run({
+    pluginOptions: { configuration: compilerOptions },
+    path: './src/FileFolder/InnerFileFolder/File.ts',
+    input: null,
+    expected: null
+  });
+});
+
 it('should throw with multiple imports on one line', async () => {
   return expect(run({
     pluginOptions: { configuration: { compilerOptions } },
@@ -124,6 +176,15 @@ it('should throw with no path', async () => {
   await expect(run({
     pluginOptions: { configuration: compilerOptions },
     path: undefined,
+    input: '',
+    expected: '',
+  })).rejects.toThrow()
+});
+
+it('should throw with no paths in compilerOptions', async () => {
+  await expect(run({
+    pluginOptions: { configuration: { paths: undefined! } },
+    path: './src/FileFolder/InnerFileFolder/File.ts',
     input: '',
     expected: '',
   })).rejects.toThrow()
