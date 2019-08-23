@@ -1,5 +1,4 @@
 import path from 'path';
-import PluginError from 'plugin-error';
 import ObjectStream, { EnteredArgs } from 'o-stream';
 
 import File = require('vinyl');
@@ -59,7 +58,7 @@ function findImport(line: string): string | null {
   })
 
   if (multiple) {
-    throw new PluginError('gulp-ts-alias', 'Multiple imports on the same line are currently not supported!');
+    throw new Error('Multiple imports on the same line are currently not supported!');
   }
 
   return matches[2];
@@ -134,14 +133,14 @@ function resolveImports(file: ReadonlyArray<string>, imports: FileData[], option
 const aliasPlugin: AliasPlugin = (pluginOptions: PluginOptions) => {
   if (pluginOptions.configuration === undefined || pluginOptions.configuration === null) {
     // tslint:disable-next-line:max-line-length
-    throw new PluginError('gulp-ts-alias', 'The \"configuration\" option cannot be empty. Provide the tsconfig or compilerOptions object.');
+    throw new Error('The \"configuration\" option cannot be empty. Provide the tsconfig or compilerOptions object.');
   }
 
   // tslint:disable-next-line:max-line-length
   const compilerOptions: CompilerOptions = (pluginOptions.configuration as TSConfig).compilerOptions || pluginOptions.configuration as CompilerOptions;
 
   if (compilerOptions.paths === undefined || compilerOptions.paths === null) {
-    throw new PluginError('gulp-ts-alias', 'Unable to find the \"paths\" property in the supplied configuration!');
+    throw new Error('Unable to find the \"paths\" property in the supplied configuration!');
   }
 
   if (compilerOptions.baseUrl === undefined || compilerOptions.baseUrl === '.') {
@@ -153,7 +152,7 @@ const aliasPlugin: AliasPlugin = (pluginOptions: PluginOptions) => {
       const file = args.object;
 
       if (file.isStream()) {
-        throw new PluginError('gulp-ts-alias', 'Streaming is not supported.');
+        throw new Error('Streaming is not supported.');
       }
 
       if (file.isNull() || !file.contents) {
@@ -162,7 +161,7 @@ const aliasPlugin: AliasPlugin = (pluginOptions: PluginOptions) => {
       }
 
       if (!file.path) {
-        throw new PluginError('gulp-ts-alias', 'Received file with no path. Files must have path to be resolved.');
+        throw new Error('Received file with no path. Files must have path to be resolved.');
       }
 
       const lines = file.contents.toString().split('\n');

@@ -10,12 +10,8 @@
     /* Strict Type-Checking Options */
     "alwaysStrict": true,
     "noImplicitAny": true,
-    "suppressImplicitAnyIndexErrors": true,
     /* Basic Options */
-    "importHelpers": true,
     /* Extra Options */
-    "experimentalDecorators": true,
-    "emitDecoratorMetadata": true,
     "allowSyntheticDefaultImports": true,
     "esModuleInterop": true,
     "rootDir": "./src",

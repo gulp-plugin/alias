@@ -5,6 +5,10 @@ This file uses change log convention from [Keep a CHANGELOG].
 
 ## [Unreleased]
 
+## [1.1.0] - 2019-08-23
+### Fixed
+- Fixed dependency issue and removed unusued dependencies.
+
 ## [1.0.0] - 2019-08-23
 ### Added
 - Added support for `require()` and `import()` call imports.
