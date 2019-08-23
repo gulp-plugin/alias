@@ -1,6 +1,6 @@
 {
   "name": "gulp-ts-alias",
-  "version": "0.2.1",
+  "version": "1.0.0",
   "description": "Use Gulp to resolve Typescript path aliases during compilation.",
   "main": "./lib/index.js",
   "types": "./lib/index.d.ts",
@@ -41,13 +41,12 @@
     "registry": "https://registry.npmjs.org"
   },
   "devDependencies": {
-    "@types/event-stream": "^3.3.34",
     "@types/jest": "^24.0.0",
     "@types/vinyl": "^2.0.2",
     "coveralls": "^3.0.6",
-    "event-stream": "^3.3.4",
     "jest": "^24.9.0",
     "merge2": "^1.2.3",
+    "o-stream": "^0.2.2",
     "ts-jest": "^24.0.2",
     "tslint": "^5.12.1",
     "tslint-eslint-rules": "^5.4.0",

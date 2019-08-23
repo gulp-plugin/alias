@@ -1,11 +1,8 @@
 import path from 'path';
-
 import PluginError from 'plugin-error';
+import ObjectStream, { EnteredArgs } from 'o-stream';
 
 import File = require('vinyl');
-
-// @ts-ignore
-import * as map from 'map-stream';
 
 export interface FileData {
   path: string;
@@ -49,13 +46,19 @@ function parseImports(file: ReadonlyArray<string>, dir: string): FileData[] {
 }
 
 function findImport(line: string): string | null {
-  const matches = line.match(/from (["'])(.*?)\1/);
+  const matches = line.match(/from (["'])(.*?)\1/) || line.match(/import\((["'])(.*?)\1\)/) || line.match(/require\((["'])(.*?)\1\)/);
 
   if (!matches) {
     return null;
   }
 
-  if (matches.length > 3) {
+  const multiple = [/from (["'])(.*?)\1/g, /import\((["'])(.*?)\1\)/g, /require\((["'])(.*?)\1\)/g].some((exp) => {
+    const results = line.match(exp);
+
+    return results && results.length > 1;
+  })
+
+  if (multiple) {
     throw new PluginError('gulp-ts-alias', 'Multiple imports on the same line are currently not supported!');
   }
 
@@ -145,34 +148,39 @@ const aliasPlugin: AliasPlugin = (pluginOptions: PluginOptions) => {
     compilerOptions.baseUrl = './';
   }
 
-  return map((file: File, cb: (error: any, file?: any) => void) => {
-    if (file.isNull() || !file.contents) {
-      return cb(null, file);
+  return ObjectStream.transform({
+    onEntered: (args: EnteredArgs<File, File>) => {
+      const file = args.object;
+
+      if (file.isStream()) {
+        throw new PluginError('gulp-ts-alias', 'Streaming is not supported.');
+      }
+
+      if (file.isNull() || !file.contents) {
+        args.output.push(file);
+        return;
+      }
+
+      if (!file.path) {
+        throw new PluginError('gulp-ts-alias', 'Received file with no path. Files must have path to be resolved.');
+      }
+
+      const lines = file.contents.toString().split('\n');
+      const imports = parseImports(lines, file.path);
+
+      if (imports.length === 0) {
+        args.output.push(file);
+
+        return;
+      }
+
+      const resolved = resolveImports(lines, imports, compilerOptions);
+
+      file.contents = Buffer.from(resolved.join('\n'));
+
+      args.output.push(file);
     }
-
-    if (file.isStream()) {
-      return cb(new PluginError('gulp-ts-alias', 'Streaming is not supported.'));
-    }
-
-    const contents: Buffer | NodeJS.ReadableStream | null = file.contents;
-
-    if (contents === null) {
-      return cb(null, file);
-    }
-
-    const lines = contents.toString().split('\n');
-    const imports = parseImports(lines, file.path);
-
-    if (imports.length === 0) {
-      return cb(null, file);
-    }
-
-    const resolved = resolveImports(lines, imports, compilerOptions);
-
-    file.contents = Buffer.from(resolved.join('\n'));
-
-    cb(null, file);
-  });
+  })
 };
 
 export default aliasPlugin;

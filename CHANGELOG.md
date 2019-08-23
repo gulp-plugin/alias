@@ -5,6 +5,11 @@ This file uses change log convention from [Keep a CHANGELOG].
 
 ## [Unreleased]
 
+## [1.0.0] - 2019-08-23
+### Added
+- Added support for `require()` and `import()` call imports.
+- Added a lot more tests to raise the coverage of the plugin.
+
 ## [0.2.1] - 2019-08-22
 ### Changed
 - Updated testing and CI
@@ -45,7 +50,8 @@ This file uses change log convention from [Keep a CHANGELOG].
 [Keep a CHANGELOG]: http://keepachangelog.com
 [Semantic Versioning]: http://semver.org/
 
-[unreleased]: https://github.com/dhkatz/gulp-ts-alias/compare/0.2.1...HEAD
+[unreleased]: https://github.com/dhkatz/gulp-ts-alias/compare/1.0.0...HEAD
+[1.0.0]: https://github.com/dhkatz/gulp-ts-alias/compare/0.2.1...1.0.0
 [0.2.1]: https://github.com/dhkatz/gulp-ts-alias/compare/0.2.0...0.2.1
 [0.2.0]: https://github.com/dhkatz/gulp-ts-alias/compare/0.1.5...0.2.0
 [0.1.5]: https://github.com/dhkatz/gulp-ts-alias/compare/0.1.4...0.1.5
