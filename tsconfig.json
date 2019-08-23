@@ -1,28 +1,31 @@
 {
   "compilerOptions": {
-    "target": "es2017",
+    /* Module/Target Options */
+    "target": "es6",
     "module": "commonjs",
-    "moduleResolution": "node",
-
-    "outDir": "./build",
-    "rootDir": "./src",
-
+    "inlineSourceMap": true,
     "declaration": true,
-    "strict": true,
-    "sourceMap": true,
-
-    "noImplicitAny": true,
+    "outDir": "./lib",
+    "declarationDir": "./typings",
+    /* Strict Type-Checking Options */
     "alwaysStrict": true,
-
-    "typeRoots": ["./node_modules/@types"],
-    "resolveJsonModule": true,
-    "removeComments": true
+    "noImplicitAny": true,
+    "suppressImplicitAnyIndexErrors": true,
+    /* Basic Options */
+    "importHelpers": true,
+    /* Extra Options */
+    "experimentalDecorators": true,
+    "emitDecoratorMetadata": true,
+    "allowSyntheticDefaultImports": true,
+    "esModuleInterop": true,
+    "rootDir": "./src",
+    "baseUrl": "."
   },
-  "exclude": [
-    "./build/*",
-    "./node_modules/*"
-  ],
   "include": [
-    "./src/**/*.ts"
+    "src"
+  ],
+  "exclude": [
+    "lib",
+    "node_modules",
   ]
 }
