@@ -1,8 +1,7 @@
-import * as Stream from 'event-stream';
-import * as File from 'vinyl';
-import * as PluginError from 'plugin-error';
+import Stream from 'event-stream';
+import File from 'vinyl';
 
-import plugin, { PluginOptions, CompilerOptions } from './index';
+import plugin, { PluginOptions, CompilerOptions } from '../src';
 
 interface TestCase {
   pluginOptions: PluginOptions;
@@ -25,49 +24,31 @@ const run = (test: TestCase): void => {
       if (contents === null) {
         return cb(null, file);
       }
-
-      console.log(contents.toString());
-  }));
+    }));
 };
 
 it('should throw with no config', (done) => {
-  let error;
-
-  try {
+  expect(() => {
     run({
       pluginOptions: { configuration: undefined! },
       path: undefined,
       input: '',
       expected: '',
     });
-  } catch (e) {
-    error = e;
-  }
-
-  if (!(error instanceof PluginError)) {
-    fail('Test should have failed but did not!');
-  }
+  }).toThrow();
 
   done();
 });
 
 it('should throw with no path', (done: jest.DoneCallback) => {
-  let error;
-
-  try {
+  expect(() => {
     run({
       pluginOptions: { configuration: compilerOptions },
       path: undefined,
       input: '',
       expected: '',
     });
-  } catch (e) {
-    error = e;
-  }
-
-  if (!(error instanceof PluginError)) {
-    fail('Test should have failed but did not!');
-  }
+  }).toThrow();
 
   done();
 });

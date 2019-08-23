@@ -5,6 +5,12 @@ This file uses change log convention from [Keep a CHANGELOG].
 
 ## [Unreleased]
 
+## [0.2.1] - 2019-08-22
+### Changed
+- Updated testing and CI
+### Fixed
+- Fixed testing suite
+
 ## [0.2.0] - 2019-02-16
 ### Changed
 - Change some types to be more restrictive
@@ -39,7 +45,8 @@ This file uses change log convention from [Keep a CHANGELOG].
 [Keep a CHANGELOG]: http://keepachangelog.com
 [Semantic Versioning]: http://semver.org/
 
-[unreleased]: https://github.com/dhkatz/gulp-ts-alias/compare/0.2.0...HEAD
+[unreleased]: https://github.com/dhkatz/gulp-ts-alias/compare/0.2.1...HEAD
+[0.2.1]: https://github.com/dhkatz/gulp-ts-alias/compare/0.2.0...0.2.1
 [0.2.0]: https://github.com/dhkatz/gulp-ts-alias/compare/0.1.5...0.2.0
 [0.1.5]: https://github.com/dhkatz/gulp-ts-alias/compare/0.1.4...0.1.5
 [0.1.4]: https://github.com/dhkatz/gulp-ts-alias/compare/0.1.3...0.1.4
