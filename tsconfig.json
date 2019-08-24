@@ -3,7 +3,7 @@
     /* Module/Target Options */
     "target": "es6",
     "module": "commonjs",
-    "inlineSourceMap": true,
+    "sourceMap": true,
     "declaration": true,
     "outDir": "./lib",
     "declarationDir": "./typings",
