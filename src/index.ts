@@ -25,43 +25,23 @@ export interface PluginOptions {
 export type AliasPlugin = (pluginOptions: PluginOptions) => any;
 
 function parseImports(file: ReadonlyArray<string>, dir: string): FileData[] {
-  const results = file.map((line: string, index: number) => {
-    const imports = findImport(line);
-
-    if (imports === null) {
-      return null;
-    }
-
-    return {
-      path: dir,
-      index,
-      import: imports,
-    };
-  });
-
-  return results.filter((value: { path: string; index: number; import: string; } | null): value is FileData => {
-    return value !== null && value !== undefined;
-  });
+  return file
+    .map((line, index) => findImports(line)
+      .map((i) => ({ path: dir, index, import: i }))
+    )
+    .reduce((acc, val) => acc.concat(val), []);
 }
 
-function findImport(line: string): string | null {
-  const matches = line.match(/from (["'])(.*?)\1/) || line.match(/import\((["'])(.*?)\1\)/) || line.match(/require\((["'])(.*?)\1\)/);
+const PATTERNS = [/from (["'])(.*?)\1/, /import\((["'])(.*?)\1\)/, /require\((["'])(.*?)\1\)/];
 
-  if (!matches) {
-    return null;
-  }
+function findImports(line: string): string[] | null {
+  const matches = PATTERNS
+    .map((pattern) => line.match(RegExp(pattern, 'g')))
+    .reduce((acc, val) => acc.concat(val), [])
+    .filter((value) => value !== null)
+    .map((match) => PATTERNS.reduce((matched: RegExpMatchArray, pattern) => matched || match.match(pattern), null)[2]);
 
-  const multiple = [/from (["'])(.*?)\1/g, /import\((["'])(.*?)\1\)/g, /require\((["'])(.*?)\1\)/g].some((exp) => {
-    const results = line.match(exp);
-
-    return results && results.length > 1;
-  })
-
-  if (multiple) {
-    throw new Error('Multiple imports on the same line are currently not supported!');
-  }
-
-  return matches[2];
+  return matches;
 }
 
 function resolveImports(file: ReadonlyArray<string>, imports: FileData[], options: CompilerOptions): string[] {
