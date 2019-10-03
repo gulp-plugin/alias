@@ -151,16 +151,34 @@ it('should pass null files', async () => {
   });
 });
 
-it('should throw with multiple imports on one line', async () => {
-  return expect(run({
+it('should not throw with multiple imports on one line', async () => {
+  return run({
     pluginOptions: { configuration: { compilerOptions } },
     path: './src/FileFolder/InnerFileFolder/File.ts',
     input: `
 import A from "./asdf"; import B from "./MyAlias";
 import C from "MyAlias";
 `,
-    expected: ''
-  })).rejects.toThrow();
+    expected: `
+import A from "./asdf"; import B from "./MyAlias";
+import C from "../../MyAliasFolder/MyAliasClass";
+`
+  });
+});
+
+it('should not throw with mixed multiple imports on one line', async () => {
+  return run({
+    pluginOptions: { configuration: { compilerOptions } },
+    path: './src/FileFolder/InnerFileFolder/File.ts',
+    input: `
+import A from "./asdf";
+import C from "MyAlias"; import B from "./MyAlias";
+`,
+    expected: `
+import A from "./asdf";
+import C from "../../MyAliasFolder/MyAliasClass"; import B from "./MyAlias";
+`
+  });
 });
 
 it('should throw with no config', async () => {
