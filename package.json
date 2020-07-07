@@ -42,7 +42,7 @@
     "registry": "https://registry.npmjs.org"
   },
   "devDependencies": {
-    "@types/jest": "^24.0.0",
+    "@types/jest": "^26.0.4",
     "@types/node": "^13.1.2",
     "@types/vinyl": "^2.0.2",
     "coveralls": "^3.0.6",
