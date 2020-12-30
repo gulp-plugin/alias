@@ -16,62 +16,41 @@ export interface TSConfig {
 export interface CompilerOptions {
   baseUrl?: string;
   paths: { [key: string]: string[] | undefined; };
+  cwd?: string;
 }
 
 export interface PluginOptions {
   configuration: TSConfig | CompilerOptions;
+  cwd?: string;
 }
 
 export type AliasPlugin = (pluginOptions: PluginOptions) => any;
 
 const COMMENTED_PATTERN = /(\/\*(?:(?!\*\/).|[\n\r])*\*\/)|(\/\/[^\n\r]*(?:[\n\r]+|$))/;
+const IMPORT_PATTERNS = [/from (["'])(.*?)\1/, /import\((["'])(.*?)\1\)/, /require\((["'])(.*?)\1\)/];
 
 function parseImports(file: ReadonlyArray<string>, dir: string): FileData[] {
-  const results = file.map((line: string, index: number) => {
-    const imports = findImport(line);
-
-    if (imports === null) {
-      return null;
-    }
-
-    return {
-      path: dir,
-      index,
-      import: imports,
-    };
-  });
-
-  return results.filter((value: { path: string; index: number; import: string; } | null): value is FileData => {
-    return value !== null && value !== undefined;
-  });
+  return file
+    .map((line, index) => findImports(line)
+      .map((i) => ({ path: dir, index, import: i })),
+    )
+    .reduce((acc, val) => acc.concat(val), []);
 }
 
-function findImport(line: string): string | null {
-  const matches = line.match(/from (["'])(.*?)\1/) || line.match(/import\((["'])(.*?)\1\)/) || line.match(/require\((["'])(.*?)\1\)/);
-
-  if (!matches) {
-    return null;
-  }
-
+function findImports(line: string): string[] | null {
   if (line.match(COMMENTED_PATTERN)) {
-    return null;
+    return [];
   }
 
-  const multiple = [/from (["'])(.*?)\1/g, /import\((["'])(.*?)\1\)/g, /require\((["'])(.*?)\1\)/g].some((exp) => {
-    const results = line.match(exp);
-
-    return results && results.length > 1;
-  });
-
-  if (multiple) {
-    throw new Error('Multiple imports on the same line are currently not supported!');
-  }
-
-  return matches[2];
+  return IMPORT_PATTERNS
+    .map((pattern) => line.match(RegExp(pattern, 'g')))
+    .reduce((acc, val) => acc.concat(val), [])
+    .filter((value): value is any => value !== null)
+    .map((match) => IMPORT_PATTERNS.reduce((matched, pattern) => matched || match.match(pattern), null)[2]);
 }
 
 function resolveImports(file: ReadonlyArray<string>, imports: FileData[], options: CompilerOptions): string[] {
-  const { baseUrl, paths } = options;
+  const { baseUrl, paths, cwd } = options;
 
   const aliases: { [key: string]: string[] | undefined } = {};
   for (const alias in paths) {
@@ -113,9 +92,11 @@ function resolveImports(file: ReadonlyArray<string>, imports: FileData[], option
       continue;
     }
 
-    let relative = path.relative(path.dirname(imported.path), baseUrl || './');
+    const dirname = path.dirname(imported.path);
+    let relative = path.join(path.resolve(baseUrl || './'), cwd);
+    relative = path.relative(dirname, relative);
     relative = path.join(relative, resolved);
-    relative = path.relative(path.dirname(imported.path), path.resolve(path.dirname(imported.path), relative));
+    relative = path.relative(dirname, path.join(dirname, relative));
     relative = relative.replace(/\\/g, '/');
 
     if (relative.length === 0 || !relative.startsWith('.')) {
@@ -143,6 +124,12 @@ const aliasPlugin: AliasPlugin = (pluginOptions: PluginOptions) => {
 
   if (compilerOptions.baseUrl === undefined || compilerOptions.baseUrl === '.') {
     compilerOptions.baseUrl = './';
+  }
+
+  if (pluginOptions.cwd === undefined || pluginOptions.cwd === '.') {
+    compilerOptions.cwd = './';
+  } else {
+    compilerOptions.cwd = pluginOptions.cwd;
   }
 
   return ObjectStream.transform({

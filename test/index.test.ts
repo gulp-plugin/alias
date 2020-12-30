@@ -11,7 +11,7 @@ interface TestCase {
 }
 
 // tslint:disable-next-line:object-literal-key-quotes
-const compilerOptions: CompilerOptions = { paths: { 'MyAlias': ['MyAliasFolder/MyAliasClass'] }, baseUrl: './src' };
+const compilerOptions: CompilerOptions = { paths: { 'MyAlias': ['./src/MyAliasFolder/MyAliasClass'] }, baseUrl: '.' };
 
 const run = async (test: TestCase): Promise<void> => {
   return new Promise<void>((resolve, reject) => {
@@ -73,7 +73,7 @@ import C from "../../MyAliasFolder/MyAliasClass";
 
 it('should work with no baseUrl', async () => {
   return run({
-    pluginOptions: { configuration: { paths: { MyAlias: ['MyAliasFolder/MyAliasClass'] } } },
+    pluginOptions: { configuration: { paths: { MyAlias: ['src/MyAliasFolder/MyAliasClass'] } } },
     path: './src/FileFolder/InnerFileFolder/File.ts',
     input: `
 import A from "./asdf";
@@ -83,7 +83,7 @@ import C from "MyAlias";
     expected: `
 import A from "./asdf";
 import B from "./MyAlias";
-import C from "../../../MyAliasFolder/MyAliasClass";
+import C from "../../MyAliasFolder/MyAliasClass";
 `,
   });
 });
@@ -207,6 +207,47 @@ import A from "./asdf";
 import B from "./MyAlias";
 // import C from "MyAlias";
 /* import D from "MyAlias"; */
+`,
+  });
+});
+
+it('should support different working directories', async () => {
+  return run({
+    pluginOptions: { configuration: { ...compilerOptions, baseUrl: './tasks' }, cwd: '../' },
+    path: './src/FileFolder/InnerFileFolder/File.ts',
+    input: `
+import A from "./asdf";
+import B from "./MyAlias";
+import C from "MyAlias";
+import D from "express";
+`,
+    expected: `
+import A from "./asdf";
+import B from "./MyAlias";
+import C from "../../MyAliasFolder/MyAliasClass";
+import D from "express";
+`,
+  });
+});
+
+it('should support different working directories with node_modules', async () => {
+  return run({
+    pluginOptions: {
+      configuration: { ...compilerOptions, paths: { MyAlias: ['node_modules/@lib/MyAliasClass'] }, baseUrl: './tasks' },
+      cwd: '../' ,
+    },
+    path: './src/FileFolder/InnerFileFolder/File.ts',
+    input: `
+import A from "./asdf";
+import B from "./MyAlias";
+import C from "MyAlias";
+import D from "express";
+`,
+    expected: `
+import A from "./asdf";
+import B from "./MyAlias";
+import C from "../../../node_modules/@lib/MyAliasClass";
+import D from "express";
 `,
   });
 });
