@@ -24,6 +24,8 @@ export interface PluginOptions {
 
 export type AliasPlugin = (pluginOptions: PluginOptions) => any;
 
+const COMMENTED_PATTERN = /(\/\*(?:(?!\*\/).|[\n\r])*\*\/)|(\/\/[^\n\r]*(?:[\n\r]+|$))/;
+
 function parseImports(file: ReadonlyArray<string>, dir: string): FileData[] {
   const results = file.map((line: string, index: number) => {
     const imports = findImport(line);
@@ -51,11 +53,15 @@ function findImport(line: string): string | null {
     return null;
   }
 
+  if (line.match(COMMENTED_PATTERN)) {
+    return null;
+  }
+
   const multiple = [/from (["'])(.*?)\1/g, /import\((["'])(.*?)\1\)/g, /require\((["'])(.*?)\1\)/g].some((exp) => {
     const results = line.match(exp);
 
     return results && results.length > 1;
-  })
+  });
 
   if (multiple) {
     throw new Error('Multiple imports on the same line are currently not supported!');
@@ -90,7 +96,7 @@ function resolveImports(file: ReadonlyArray<string>, imports: FileData[], option
       if (aliases.hasOwnProperty(alias) && imported.import.startsWith(alias)) {
         const choices: string[] | undefined = aliases[alias];
 
-        if (choices != undefined) {
+        if (choices !== undefined) {
           resolved = choices[0];
           if (resolved.endsWith('/*')) {
             resolved = resolved.replace('/*', '/');
@@ -143,6 +149,7 @@ const aliasPlugin: AliasPlugin = (pluginOptions: PluginOptions) => {
     onEntered: (args: EnteredArgs<File, File>) => {
       const file = args.object;
 
+      /* istanbul ignore if */
       if (file.isStream()) {
         throw new Error('Streaming is not supported.');
       }
@@ -170,8 +177,8 @@ const aliasPlugin: AliasPlugin = (pluginOptions: PluginOptions) => {
       file.contents = Buffer.from(resolved.join('\n'));
 
       args.output.push(file);
-    }
-  })
+    },
+  });
 };
 
 export default aliasPlugin;

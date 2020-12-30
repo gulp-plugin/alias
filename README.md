@@ -12,10 +12,13 @@ Resolve TypeScript import aliases and paths defined in `tsconfig`.
 
 There have been previous attempts at releasing Gulp plugins that accomplish something similar, but all have become unmaintained.
 
-For legacy sake, here is a list of previous packages/scripts that have been considered:
+For legacy’s sake, here is a list of previous packages/scripts that have been considered:
 
 [gulp-ts-paths](https://www.npmjs.com/package/gulp-ts-paths)
 [path-alias-resolver](https://gist.github.com/azarus/f369ee2ab0283ba0793b0ccf0e9ec590)
+
+**Note:** Currently, multiple imports per line are not supported! 
+Imports within multiline comments may also be replaced.
 
 ## Usage
 
@@ -47,7 +50,7 @@ The following configuration is common in `tsconfig` configuration files
   "rootDir": "./src",
   "baseUrl": ".",
   "paths": {
-    "@/*": ["src/*"],
+    "@/*": ["src/*"]
   }
 }
 ```

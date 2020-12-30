@@ -23,7 +23,9 @@ const run = async (test: TestCase): Promise<void> => {
       .pipe(ObjectStream.transform({
         onEntered: (args: EnteredArgs<File, void>) => {
           try {
-            expect(args.object.contents ? args.object.contents.toString() : args.object.contents).toEqual(test.expected);
+            expect(
+              args.object.contents ? args.object.contents.toString() : args.object.contents,
+            ).toEqual(test.expected);
           } catch (error) {
             reject(error);
           }
@@ -48,7 +50,7 @@ import A from "./asdf";
 import B from "./MyAlias";
 import C from "../../MyAliasFolder/MyAliasClass";
 import D from "express";
-`
+`,
   });
 });
 
@@ -65,13 +67,13 @@ import C from "MyAlias";
 import A from "./asdf";
 import B from "./MyAlias";
 import C from "../../MyAliasFolder/MyAliasClass";
-`
+`,
   });
 });
 
 it('should work with no baseUrl', async () => {
   return run({
-    pluginOptions: { configuration: { paths: { 'MyAlias': ['MyAliasFolder/MyAliasClass'] } } },
+    pluginOptions: { configuration: { paths: { MyAlias: ['MyAliasFolder/MyAliasClass'] } } },
     path: './src/FileFolder/InnerFileFolder/File.ts',
     input: `
 import A from "./asdf";
@@ -82,7 +84,7 @@ import C from "MyAlias";
 import A from "./asdf";
 import B from "./MyAlias";
 import C from "../../../MyAliasFolder/MyAliasClass";
-`
+`,
   });
 });
 
@@ -95,7 +97,7 @@ import("MyAlias").then(test => test());
 `,
     expected: `
 import("../../MyAliasFolder/MyAliasClass").then(test => test());
-`
+`,
   });
 });
 
@@ -112,7 +114,7 @@ const C = require("MyAlias");
 const A = require("./asdf");
 const B = require("./MyAlias");
 const C = require("../../MyAliasFolder/MyAliasClass");
-`
+`,
   });
 });
 
@@ -129,7 +131,7 @@ const C = require("test");
 const A = require("./asdf");
 const B = require("./MyAlias");
 const C = require("test");
-`
+`,
   });
 });
 
@@ -138,7 +140,7 @@ it('should pass empty files', async () => {
     pluginOptions: { configuration: compilerOptions },
     path: './src/FileFolder/InnerFileFolder/File.ts',
     input: '',
-    expected: ''
+    expected: '',
   });
 });
 
@@ -147,7 +149,7 @@ it('should pass null files', async () => {
     pluginOptions: { configuration: compilerOptions },
     path: './src/FileFolder/InnerFileFolder/File.ts',
     input: null,
-    expected: null
+    expected: null,
   });
 });
 
@@ -159,7 +161,7 @@ it('should throw with multiple imports on one line', async () => {
 import A from "./asdf"; import B from "./MyAlias";
 import C from "MyAlias";
 `,
-    expected: ''
+    expected: '',
   })).rejects.toThrow();
 });
 
@@ -178,7 +180,7 @@ it('should throw with no path', async () => {
     path: undefined,
     input: '',
     expected: '',
-  })).rejects.toThrow()
+  })).rejects.toThrow();
 });
 
 it('should throw with no paths in compilerOptions', async () => {
@@ -187,5 +189,24 @@ it('should throw with no paths in compilerOptions', async () => {
     path: './src/FileFolder/InnerFileFolder/File.ts',
     input: '',
     expected: '',
-  })).rejects.toThrow()
+  })).rejects.toThrow();
+});
+
+it('should skip commented lines with imports', async () => {
+  return run({
+    pluginOptions: { configuration: { compilerOptions } },
+    path: './src/FileFolder/InnerFileFolder/File.ts',
+    input: `
+import A from "./asdf";
+import B from "./MyAlias";
+// import C from "MyAlias";
+/* import D from "MyAlias"; */
+`,
+    expected: `
+import A from "./asdf";
+import B from "./MyAlias";
+// import C from "MyAlias";
+/* import D from "MyAlias"; */
+`,
+  });
 });
