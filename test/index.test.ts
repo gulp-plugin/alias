@@ -251,3 +251,24 @@ import D from "express";
 `,
   });
 });
+
+it('should work with import file direct', async () => {
+  return run({
+    pluginOptions: { configuration: compilerOptions },
+    path: './src/FileFolder/InnerFileFolder/File.ts',
+    input: `
+import "./asdf";
+import B from "./MyAlias";
+import "MyAlias";
+import     "MyAlias";
+import D from "express";
+`,
+    expected: `
+import "./asdf";
+import B from "./MyAlias";
+import "../../MyAliasFolder/MyAliasClass";
+import     "../../MyAliasFolder/MyAliasClass";
+import D from "express";
+`,
+  });
+});

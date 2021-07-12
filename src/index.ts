@@ -27,7 +27,7 @@ export interface PluginOptions {
 export type AliasPlugin = (pluginOptions: PluginOptions) => any;
 
 const COMMENTED_PATTERN = /(\/\*(?:(?!\*\/).|[\n\r])*\*\/)|(\/\/[^\n\r]*(?:[\n\r]+|$))/;
-const IMPORT_PATTERNS = [/from (["'])(.*?)\1/, /import\((["'])(.*?)\1\)/, /require\((["'])(.*?)\1\)/];
+const IMPORT_PATTERNS = [/from (["'])(.*?)\1/, /import\((["'])(.*?)\1\)/, /require\((["'])(.*?)\1\)/, /import\s+(["'])(.*?)\1/];
 
 function parseImports(file: ReadonlyArray<string>, dir: string): FileData[] {
   return file
