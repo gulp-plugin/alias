@@ -107,14 +107,15 @@ function resolveConfig(config?: string | ts.CompilerOptions, cwd?: string): ts.C
       configPath = ts.findConfigFile(cwd, ts.sys.fileExists)
     }
 
+    /* istanbul ignore else */
     if (!configPath) {
       throw new Error("Could not find a valid 'tsconfig.json'")
+    } else {
+      const configFile = ts.readConfigFile(configPath, ts.sys.readFile)
+      const { options } = ts.parseJsonConfigFileContent(configFile.config, ts.sys, cwd)
+
+      return options
     }
-
-    const configFile = ts.readConfigFile(configPath, ts.sys.readFile)
-    const { options } = ts.parseJsonConfigFileContent(configFile.config, ts.sys, cwd)
-
-    return options
   }
 
   if (typeof config === 'string') {
