@@ -1,6 +1,6 @@
 # gulp-ts-alias ![npm](https://img.shields.io/npm/v/gulp-ts-alias)
 
-[![Build Status](https://travis-ci.org/dhkatz/gulp-ts-alias.svg?branch=master)](https://travis-ci.org/dhkatz/gulp-ts-alias) [![Coverage Status](https://coveralls.io/repos/github/dhkatz/gulp-ts-alias/badge.svg?branch=master)](https://coveralls.io/github/dhkatz/gulp-ts-alias?branch=master) ![npm](https://img.shields.io/npm/dm/gulp-ts-alias)
+[![Coverage Status](https://coveralls.io/repos/github/dhkatz/gulp-ts-alias/badge.svg?branch=master)](https://coveralls.io/github/dhkatz/gulp-ts-alias?branch=master) ![npm](https://img.shields.io/npm/dm/gulp-ts-alias)
 
 Resolve TypeScript import aliases and paths defined in `tsconfig`.
 
@@ -10,15 +10,22 @@ Resolve TypeScript import aliases and paths defined in `tsconfig`.
 
 ## Information
 
+### Features
+
+* Supports all import types: `import`, `require`, `await import()`
+* Supports wild card aliases
+
+### Motivation
+
 There have been previous attempts at releasing Gulp plugins that accomplish something similar, but all have become unmaintained.
 
 For legacy’s sake, here is a list of previous packages/scripts that have been considered:
 
 [gulp-ts-paths](https://www.npmjs.com/package/gulp-ts-paths)
+
 [path-alias-resolver](https://gist.github.com/azarus/f369ee2ab0283ba0793b0ccf0e9ec590)
 
-**Note:** Currently, multiple imports per line are not supported! 
-Imports within multiline comments may also be replaced.
+**Note:** Imports within multiline comments may also be replaced.
 
 ## Usage
 
@@ -27,11 +34,13 @@ const typescript = require('gulp-typescript');
 const sourcemaps = require('gulp-sourcemaps');
 const alias = require('gulp-ts-alias');
 
-const project = typescript.createProject('tsconfig.json');
+const { config } = typescript.createProject('tsconfig.json');
 
 function build() {
   const compiled = src('./src/**/*.ts')
-    .pipe(alias({ configuration: project.config }))
+    .pipe(alias(config))
+    // or .pipe(alias('tsconfig.json'))
+    // or even .pipe(alias())
     .pipe(sourcemaps.init())
     .pipe(project());
 

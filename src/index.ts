@@ -1,175 +1,213 @@
-import path from 'path';
-import ObjectStream, { EnteredArgs } from 'o-stream';
+import path from "path"
+import { TransformCallback, Transform } from "stream"
+import ts from "typescript"
 
-import File = require('vinyl');
+import File = require("vinyl")
+
+export type CompilerOptions = ts.CompilerOptions
 
 export interface FileData {
-  path: string;
-  index: number;
-  import: string;
-}
-
-export interface TSConfig {
-  compilerOptions: CompilerOptions;
-}
-
-export interface CompilerOptions {
-  baseUrl?: string;
-  paths: { [key: string]: string[] | undefined; };
-  cwd?: string;
+  path: string
+  index: number
+  import: string
 }
 
 export interface PluginOptions {
-  configuration: TSConfig | CompilerOptions;
-  cwd?: string;
+  config?: ts.CompilerOptions | string
+  cwd?: string
 }
 
-export type AliasPlugin = (pluginOptions: PluginOptions) => any;
+export type AliasPlugin = (pluginOptions: PluginOptions) => Transform
 
-const COMMENTED_PATTERN = /(\/\*(?:(?!\*\/).|[\n\r])*\*\/)|(\/\/[^\n\r]*(?:[\n\r]+|$))/;
-const IMPORT_PATTERNS = [/from (["'])(.*?)\1/, /import\((["'])(.*?)\1\)/, /require\((["'])(.*?)\1\)/, /import\s+(["'])(.*?)\1/];
+const COMMENTED_PATTERN =
+  /(\/\*(?:(?!\*\/).|[\n\r])*\*\/)|(\/\/[^\n\r]*(?:[\n\r]+|$))/
+const IMPORT_PATTERNS = [
+  /from (["'])(.*?)\1/g,
+  /import\((["'])(.*?)\1\)/,
+  /require\((["'])(.*?)\1\)/,
+  /import\s+(["'])(.*?)\1/,
+]
 
 function parseImports(file: ReadonlyArray<string>, dir: string): FileData[] {
-  return file
-    .map((line, index) => findImports(line)
-      .map((i) => ({ path: dir, index, import: i })),
-    )
-    .reduce((acc, val) => acc.concat(val), []);
+  return file.flatMap((line, index) =>
+    findImports(line).map((i) => ({ path: dir, index, import: i }))
+  )
 }
 
 function findImports(line: string): string[] | null {
-  if (line.match(COMMENTED_PATTERN)) {
-    return [];
-  }
+  line = line.replace(COMMENTED_PATTERN, "")
 
-  return IMPORT_PATTERNS
-    .map((pattern) => line.match(RegExp(pattern, 'g')))
-    .reduce((acc, val) => acc.concat(val), [])
-    .filter((value): value is any => value !== null)
-    .map((match) => IMPORT_PATTERNS.reduce((matched, pattern) => matched || match.match(pattern), null)[2]);
+  return IMPORT_PATTERNS.flatMap((pattern) =>
+    [...line.matchAll(pattern)].map((match) => match[2])
+  )
 }
 
-function resolveImports(file: ReadonlyArray<string>, imports: FileData[], options: CompilerOptions): string[] {
-  const { baseUrl, paths, cwd } = options;
+function resolveImports(
+  file: ReadonlyArray<string>,
+  imports: FileData[],
+  options: ts.CompilerOptions
+): string[] {
+  const { baseUrl, paths, cwd } = options
 
-  const aliases: { [key: string]: string[] | undefined } = {};
+  const aliases: { [key: string]: string[] | undefined } = {}
   for (const alias in paths) {
     /* istanbul ignore else  */
     if (paths.hasOwnProperty(alias)) {
-      let resolved = alias;
-      if (alias.endsWith('/*')) {
-        resolved = alias.replace('/*', '/');
+      let resolved = alias
+      if (alias.endsWith("/*")) {
+        resolved = alias.replace("/*", "/")
       }
 
-      aliases[resolved] = paths[alias];
+      aliases[resolved] = paths[alias]
     }
   }
 
-  const lines: string[] = [...file];
+  const lines: string[] = [...file]
   for (const imported of imports) {
-    const line = file[imported.index];
+    const line = file[imported.index]
 
-    let resolved: string = '';
+    let resolved = ""
     for (const alias in aliases) {
       /* istanbul ignore else  */
       if (aliases.hasOwnProperty(alias) && imported.import.startsWith(alias)) {
-        const choices: string[] | undefined = aliases[alias];
+        const choices: string[] | undefined = aliases[alias]
 
         if (choices !== undefined) {
-          resolved = choices[0];
-          if (resolved.endsWith('/*')) {
-            resolved = resolved.replace('/*', '/');
+          resolved = choices[0]
+          if (resolved.endsWith("/*")) {
+            resolved = resolved.replace("/*", "/")
           }
 
-          resolved = imported.import.replace(alias, resolved);
+          resolved = imported.import.replace(alias, resolved)
 
-          break;
+          break
         }
       }
     }
 
     if (resolved.length < 1) {
-      continue;
+      continue
     }
 
-    const dirname = path.dirname(imported.path);
-    let relative = path.join(path.resolve(baseUrl || './'), cwd);
-    relative = path.relative(dirname, relative);
-    relative = path.join(relative, resolved);
-    relative = path.relative(dirname, path.join(dirname, relative));
-    relative = relative.replace(/\\/g, '/');
+    const dirname = path.dirname(imported.path)
+    let relative = path.join(path.resolve(baseUrl || "./"), cwd as string)
+    relative = path.relative(dirname, relative)
+    relative = path.join(relative, resolved)
+    relative = path.relative(dirname, path.join(dirname, relative))
+    relative = relative.replace(/\\/g, "/")
 
-    if (relative.length === 0 || !relative.startsWith('.')) {
-      relative = './' + relative;
-    }
+    // if (relative.length === 0 || !relative.startsWith(".")) {
+    //   relative = "./" + relative
+    // }
 
-    lines[imported.index] = line.replace(imported.import, relative);
+    lines[imported.index] = line.replace(imported.import, relative)
   }
 
-  return lines;
+  return lines
 }
 
-const aliasPlugin: AliasPlugin = (pluginOptions: PluginOptions) => {
-  if (pluginOptions.configuration === undefined || pluginOptions.configuration === null) {
-    // tslint:disable-next-line:max-line-length
-    throw new Error('The \"configuration\" option cannot be empty. Provide the tsconfig or compilerOptions object.');
+function resolveConfig(
+  config?: string | ts.CompilerOptions,
+  cwd?: string
+): ts.CompilerOptions {
+  if (!config) {
+    let configPath: string | undefined
+
+    /* istanbul ignore if */
+    if (process.env.NODE_ENV !== "test") {
+      configPath = ts.findConfigFile(cwd, ts.sys.fileExists)
+    }
+
+    if (!configPath) {
+      throw new Error("Could not find a valid 'tsconfig.json'")
+    }
+
+    const configFile = ts.readConfigFile(configPath, ts.sys.readFile)
+    const { options } = ts.parseJsonConfigFileContent(
+      configFile.config,
+      ts.sys,
+      cwd
+    )
+
+    return options
   }
 
-  // tslint:disable-next-line:max-line-length
-  const compilerOptions: CompilerOptions = (pluginOptions.configuration as TSConfig).compilerOptions || pluginOptions.configuration as CompilerOptions;
+  if (typeof config === "string") {
+    const configFile = ts.readConfigFile(config, ts.sys.readFile)
+    const { options } = ts.parseJsonConfigFileContent(
+      configFile.config,
+      ts.sys,
+      cwd
+    )
 
-  if (compilerOptions.paths === undefined || compilerOptions.paths === null) {
-    throw new Error('Unable to find the \"paths\" property in the supplied configuration!');
+    return options
   }
 
-  if (compilerOptions.baseUrl === undefined || compilerOptions.baseUrl === '.') {
-    compilerOptions.baseUrl = './';
+  return config
+}
+
+const alias: AliasPlugin = ({ config, cwd }: PluginOptions) => {
+  cwd = cwd === undefined ? process.cwd() : cwd === "." ? "./" : cwd
+
+  const compilerOptions = resolveConfig(config, cwd)
+
+  if (!compilerOptions.paths) {
+    throw new Error(
+      "Unable to find the 'paths' property in the supplied configuration!"
+    )
   }
 
-  if (pluginOptions.cwd === undefined || pluginOptions.cwd === '.') {
-    compilerOptions.cwd = './';
-  } else {
-    compilerOptions.cwd = pluginOptions.cwd;
+  if (
+    compilerOptions.baseUrl === undefined ||
+    compilerOptions.baseUrl === "."
+  ) {
+    compilerOptions.baseUrl = "./"
   }
 
-  return ObjectStream.transform({
-    onEntered: (args: EnteredArgs<File, File>) => {
-      const file = args.object;
+  compilerOptions.cwd = cwd
 
+  return new Transform({
+    objectMode: true,
+    transform(
+      file: File,
+      encoding: BufferEncoding,
+      callback: TransformCallback
+    ) {
       /* istanbul ignore if */
       if (file.isStream()) {
-        throw new Error('Streaming is not supported.');
+        return callback(new Error("Streaming is not supported."))
       }
 
       if (file.isNull() || !file.contents) {
-        args.output.push(file);
-        return;
+        return callback(undefined, file)
       }
 
       if (!file.path) {
-        throw new Error('Received file with no path. Files must have path to be resolved.');
+        return callback(
+          new Error(
+            "Received file with no path. Files must have path to be resolved."
+          )
+        )
       }
 
-      const lines = file.contents.toString().split('\n');
-      const imports = parseImports(lines, file.path);
+      const lines = file.contents.toString().split("\n")
+      const imports = parseImports(lines, file.path)
 
       if (imports.length === 0) {
-        args.output.push(file);
-
-        return;
+        return callback(undefined, file)
       }
 
-      const resolved = resolveImports(lines, imports, compilerOptions);
+      const resolved = resolveImports(lines, imports, compilerOptions)
 
-      file.contents = Buffer.from(resolved.join('\n'));
+      file.contents = Buffer.from(resolved.join("\n"))
 
-      args.output.push(file);
+      callback(undefined, file)
     },
-  });
-};
+  })
+}
 
-export default aliasPlugin;
+export default alias
 
 // ES5/ES6 fallbacks
-module.exports = aliasPlugin;
-module.exports.default = aliasPlugin;
+module.exports = alias
+module.exports.default = alias

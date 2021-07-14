@@ -2,7 +2,7 @@
   "compilerOptions": {
     /* Module/Target Options */
     "target": "es6",
-    "lib": ["es2019"],
+    "lib": ["es2019", "es2020.string"],
     "module": "commonjs",
     "sourceMap": true,
     "declaration": true,
