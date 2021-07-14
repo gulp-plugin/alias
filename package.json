@@ -15,9 +15,8 @@
     "build:types": "tsc --emitDeclarationOnly",
     "build:js": "tsc",
     "lint": "eslint src/**/* && tsc --noEmit",
-    "test": "./node_modules/.bin/jest --ci --verbose --forceExit --detectOpenHandles",
-    "test:coverage": "./node_modules/.bin/jest --coverage --ci",
-    "coverage": "./node_modules/.bin/jest --coverage && cat ./coverage/lcov.info | ./node_modules/.bin/coveralls",
+    "test": "jest --ci --verbose --forceExit --detectOpenHandles --coverage",
+    "test:coverage": "coveralls < coverage/lcov.info",
     "prepublishOnly": "npm run build"
   },
   "author": {
