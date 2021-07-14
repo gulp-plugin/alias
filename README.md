@@ -1,4 +1,5 @@
-# gulp-ts-alias ![npm](https://img.shields.io/npm/v/gulp-ts-alias)
+# gulp-ts-alias ![npm (custom registry)](https://img.shields.io/npm/v/@dhkatz/gulp-ts-alias?logo=npm) [![GitHub Package Registry version](https://img.shields.io/github/release/dhkatz/gulp-ts-alias.svg?label=gpr&logo=github)](https://github.com/dhkatz/gulp-ts-alias/packages/896848)
+
 
 [![Build](https://github.com/dhkatz/gulp-ts-alias/actions/workflows/node.js.yml/badge.svg)](https://github.com/dhkatz/gulp-ts-alias/actions/workflows/node.js.yml)
 [![Coverage Status](https://coveralls.io/repos/github/dhkatz/gulp-ts-alias/badge.svg?branch=master)](https://coveralls.io/github/dhkatz/gulp-ts-alias?branch=master) ![npm](https://img.shields.io/npm/dm/gulp-ts-alias)
