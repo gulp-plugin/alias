@@ -1,8 +1,8 @@
-import path from "path"
-import { TransformCallback, Transform } from "stream"
-import ts from "typescript"
+import path from 'path'
+import { TransformCallback, Transform } from 'stream'
+import ts from 'typescript'
 
-import File = require("vinyl")
+import File = require('vinyl')
 
 export type CompilerOptions = ts.CompilerOptions
 
@@ -19,8 +19,7 @@ export interface PluginOptions {
 
 export type AliasPlugin = (pluginOptions: PluginOptions) => Transform
 
-const COMMENTED_PATTERN =
-  /(\/\*(?:(?!\*\/).|[\n\r])*\*\/)|(\/\/[^\n\r]*(?:[\n\r]+|$))/
+const COMMENTED_PATTERN = /(\/\*(?:(?!\*\/).|[\n\r])*\*\/)|(\/\/[^\n\r]*(?:[\n\r]+|$))/
 const IMPORT_PATTERNS = [
   /from (["'])(.*?)\1/g,
   /import\((["'])(.*?)\1\)/g,
@@ -35,11 +34,9 @@ function parseImports(file: ReadonlyArray<string>, dir: string): FileData[] {
 }
 
 function findImports(line: string): string[] | null {
-  line = line.replace(COMMENTED_PATTERN, "")
+  line = line.replace(COMMENTED_PATTERN, '')
 
-  return IMPORT_PATTERNS.flatMap((pattern) =>
-    [...line.matchAll(pattern)].map((match) => match[2])
-  )
+  return IMPORT_PATTERNS.flatMap((pattern) => [...line.matchAll(pattern)].map((match) => match[2]))
 }
 
 function resolveImports(
@@ -54,8 +51,8 @@ function resolveImports(
     /* istanbul ignore else  */
     if (paths.hasOwnProperty(alias)) {
       let resolved = alias
-      if (alias.endsWith("/*")) {
-        resolved = alias.replace("/*", "/")
+      if (alias.endsWith('/*')) {
+        resolved = alias.replace('/*', '/')
       }
 
       aliases[resolved] = paths[alias]
@@ -66,7 +63,7 @@ function resolveImports(
   for (const imported of imports) {
     const line = file[imported.index]
 
-    let resolved = ""
+    let resolved = ''
     for (const alias in aliases) {
       /* istanbul ignore else  */
       if (aliases.hasOwnProperty(alias) && imported.import.startsWith(alias)) {
@@ -74,8 +71,8 @@ function resolveImports(
 
         if (choices !== undefined) {
           resolved = choices[0]
-          if (resolved.endsWith("/*")) {
-            resolved = resolved.replace("/*", "/")
+          if (resolved.endsWith('/*')) {
+            resolved = resolved.replace('/*', '/')
           }
 
           resolved = imported.import.replace(alias, resolved)
@@ -89,16 +86,11 @@ function resolveImports(
       continue
     }
 
-    const dirname = path.dirname(imported.path)
-    let relative = path.join(path.resolve(baseUrl || "./"), cwd as string)
-    relative = path.relative(dirname, relative)
-    relative = path.join(relative, resolved)
-    relative = path.relative(dirname, path.join(dirname, relative))
-    relative = relative.replace(/\\/g, "/")
+    const base = path.join(cwd as string, path.relative(cwd as string, baseUrl || './'))
+    const current = path.relative(base, path.dirname(imported.path))
+    const target = path.relative(base, resolved)
 
-    // if (relative.length === 0 || !relative.startsWith(".")) {
-    //   relative = "./" + relative
-    // }
+    const relative = path.relative(current, target).replace(/\\/g, '/')
 
     lines[imported.index] = line.replace(imported.import, relative)
   }
@@ -106,15 +98,12 @@ function resolveImports(
   return lines
 }
 
-function resolveConfig(
-  config?: string | ts.CompilerOptions,
-  cwd?: string
-): ts.CompilerOptions {
+function resolveConfig(config?: string | ts.CompilerOptions, cwd?: string): ts.CompilerOptions {
   if (!config) {
     let configPath: string | undefined
 
     /* istanbul ignore if */
-    if (process.env.NODE_ENV !== "test") {
+    if (process.env.NODE_ENV !== 'test') {
       configPath = ts.findConfigFile(cwd, ts.sys.fileExists)
     }
 
@@ -123,22 +112,14 @@ function resolveConfig(
     }
 
     const configFile = ts.readConfigFile(configPath, ts.sys.readFile)
-    const { options } = ts.parseJsonConfigFileContent(
-      configFile.config,
-      ts.sys,
-      cwd
-    )
+    const { options } = ts.parseJsonConfigFileContent(configFile.config, ts.sys, cwd)
 
     return options
   }
 
-  if (typeof config === "string") {
+  if (typeof config === 'string') {
     const configFile = ts.readConfigFile(config, ts.sys.readFile)
-    const { options } = ts.parseJsonConfigFileContent(
-      configFile.config,
-      ts.sys,
-      cwd
-    )
+    const { options } = ts.parseJsonConfigFileContent(configFile.config, ts.sys, cwd)
 
     return options
   }
@@ -147,35 +128,26 @@ function resolveConfig(
 }
 
 const alias: AliasPlugin = ({ config, cwd }: PluginOptions) => {
-  cwd = cwd === undefined ? process.cwd() : cwd === "." ? "./" : cwd
+  cwd = cwd === undefined ? process.cwd() : cwd === '.' ? './' : cwd
 
   const compilerOptions = resolveConfig(config, cwd)
 
   if (!compilerOptions.paths) {
-    throw new Error(
-      "Unable to find the 'paths' property in the supplied configuration!"
-    )
+    throw new Error("Unable to find the 'paths' property in the supplied configuration!")
   }
 
-  if (
-    compilerOptions.baseUrl === undefined ||
-    compilerOptions.baseUrl === "."
-  ) {
-    compilerOptions.baseUrl = "./"
+  if (compilerOptions.baseUrl === undefined || compilerOptions.baseUrl === '.') {
+    compilerOptions.baseUrl = './'
   }
 
   compilerOptions.cwd = cwd
 
   return new Transform({
     objectMode: true,
-    transform(
-      file: File,
-      encoding: BufferEncoding,
-      callback: TransformCallback
-    ) {
+    transform(file: File, encoding: BufferEncoding, callback: TransformCallback) {
       /* istanbul ignore if */
       if (file.isStream()) {
-        return callback(new Error("Streaming is not supported."))
+        return callback(new Error('Streaming is not supported.'))
       }
 
       if (file.isNull() || !file.contents) {
@@ -184,13 +156,11 @@ const alias: AliasPlugin = ({ config, cwd }: PluginOptions) => {
 
       if (!file.path) {
         return callback(
-          new Error(
-            "Received file with no path. Files must have path to be resolved."
-          )
+          new Error('Received file with no path. Files must have path to be resolved.')
         )
       }
 
-      const lines = file.contents.toString().split("\n")
+      const lines = file.contents.toString().split('\n')
       const imports = parseImports(lines, file.path)
 
       if (imports.length === 0) {
@@ -199,7 +169,7 @@ const alias: AliasPlugin = ({ config, cwd }: PluginOptions) => {
 
       const resolved = resolveImports(lines, imports, compilerOptions)
 
-      file.contents = Buffer.from(resolved.join("\n"))
+      file.contents = Buffer.from(resolved.join('\n'))
 
       callback(undefined, file)
     },
