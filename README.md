@@ -1,5 +1,6 @@
 # gulp-ts-alias ![npm](https://img.shields.io/npm/v/gulp-ts-alias)
 
+[![Build](https://github.com/dhkatz/gulp-ts-alias/actions/workflows/node.js.yml/badge.svg)](https://github.com/dhkatz/gulp-ts-alias/actions/workflows/node.js.yml)
 [![Coverage Status](https://coveralls.io/repos/github/dhkatz/gulp-ts-alias/badge.svg?branch=master)](https://coveralls.io/github/dhkatz/gulp-ts-alias?branch=master) ![npm](https://img.shields.io/npm/dm/gulp-ts-alias)
 
 Resolve TypeScript import aliases and paths defined in `tsconfig`.
