@@ -7,7 +7,7 @@ Resolve TypeScript import aliases and paths defined in `tsconfig`.
 
 ## Install
 
-`npm install --save-dev gulp-ts-alias`
+`npm install --save-dev @dhkatz/gulp-ts-alias`
 
 ## Information
 
