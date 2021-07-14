@@ -23,9 +23,9 @@ const COMMENTED_PATTERN =
   /(\/\*(?:(?!\*\/).|[\n\r])*\*\/)|(\/\/[^\n\r]*(?:[\n\r]+|$))/
 const IMPORT_PATTERNS = [
   /from (["'])(.*?)\1/g,
-  /import\((["'])(.*?)\1\)/,
-  /require\((["'])(.*?)\1\)/,
-  /import\s+(["'])(.*?)\1/,
+  /import\((["'])(.*?)\1\)/g,
+  /require\((["'])(.*?)\1\)/g,
+  /import\s+(["'])(.*?)\1/g,
 ]
 
 function parseImports(file: ReadonlyArray<string>, dir: string): FileData[] {
