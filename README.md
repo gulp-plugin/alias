@@ -1,14 +1,10 @@
-# gulp-ts-alias ![npm (custom registry)](https://img.shields.io/npm/v/@dhkatz/gulp-ts-alias?logo=npm) [![GitHub Package Registry version](https://img.shields.io/github/release/dhkatz/gulp-ts-alias.svg?label=gpr&logo=github)](https://github.com/dhkatz/gulp-ts-alias/packages/896848)
-
-
-[![Build](https://github.com/dhkatz/gulp-ts-alias/actions/workflows/node.js.yml/badge.svg)](https://github.com/dhkatz/gulp-ts-alias/actions/workflows/node.js.yml)
-[![Coverage Status](https://coveralls.io/repos/github/dhkatz/gulp-ts-alias/badge.svg?branch=master)](https://coveralls.io/github/dhkatz/gulp-ts-alias?branch=master) ![npm](https://img.shields.io/npm/dm/gulp-ts-alias)
+# @gulp-plugin/alias
 
 Resolve TypeScript import aliases and paths defined in `tsconfig`.
 
 ## Install
 
-`npm install --save-dev @dhkatz/gulp-ts-alias`
+`npm install --save-dev @gulp-plugin/alias`
 
 ## Information
 
@@ -34,7 +30,7 @@ For legacy’s sake, here is a list of previous packages/scripts that have been 
 ```javascript
 const typescript = require('gulp-typescript');
 const sourcemaps = require('gulp-sourcemaps');
-const alias = require('gulp-ts-alias');
+const alias = require('@gulp-plugin/alias');
 
 const { config } = typescript.createProject('tsconfig.json');
 

@@ -1,5 +1,5 @@
 {
-  "name": "@dhkatz/gulp-ts-alias",
+  "name": "@gulp-plugin/alias",
   "version": "2.1.0",
   "description": "Use Gulp to resolve Typescript path aliases during compilation.",
   "main": "./lib/index.js",
@@ -21,11 +21,11 @@
   },
   "author": {
     "name": "David Katz",
-    "url": "https://github.com/DoctorJew"
+    "url": "https://github.com/dhkatz"
   },
   "repository": {
     "type": "git",
-    "url": "https://github.com/dhkatz/gulp-ts-alias"
+    "url": "https://github.com/gulp-plugin/alias"
   },
   "license": "MIT",
   "keywords": [
