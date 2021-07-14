@@ -1,4 +1,8 @@
-# @gulp-plugin/alias
+# @gulp-plugin/alias ![npm (custom registry)](https://img.shields.io/npm/v/@gulp-plugin/alias?logo=npm) [![GitHub Package Registry version](https://img.shields.io/github/release/gulp-plugin/alias.svg?label=gpr&logo=github)](https://github.com/gulp-plugin/alias/packages/896973)
+
+
+[![Build](https://github.com/dhkatz/gulp-ts-alias/actions/workflows/node.js.yml/badge.svg)](https://github.com/dhkatz/gulp-ts-alias/actions/workflows/node.js.yml)
+[![Coverage Status](https://coveralls.io/repos/github/dhkatz/gulp-ts-alias/badge.svg?branch=master)](https://coveralls.io/github/dhkatz/gulp-ts-alias?branch=master) [![dependencies Status](https://david-dm.org/gulp-plugin/alias/status.svg)](https://david-dm.org/gulp-plugin/alias)
 
 Resolve TypeScript import aliases and paths defined in `tsconfig`.
 
