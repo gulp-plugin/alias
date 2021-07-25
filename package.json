@@ -1,6 +1,6 @@
 {
   "name": "@gulp-plugin/alias",
-  "version": "2.2.1",
+  "version": "2.2.2",
   "description": "Use Gulp to resolve Typescript path aliases during compilation.",
   "main": "./lib/index.js",
   "types": "./typings/index.d.ts",
