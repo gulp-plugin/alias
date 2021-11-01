@@ -50,6 +50,14 @@ const tests: Record<string, Test> = {
     input: "import module from 'module'\nimport Component from '@/components'",
     output: "import module from 'module'\nimport Component from '../components'",
   },
+  ['should support wild card aliases : fix incorrect path when resolve to the same or the sub folder']:
+    // https://github.com/gulp-plugin/alias/issues/404
+    {
+      options: { config: { paths: { '@/*': ['./src/*'] } } },
+      path: './src/pages/Page.ts',
+      input: "import module from 'module'\nimport Component from '@/pages/components'",
+      output: "import module from 'module'\nimport Component from './components'",
+    },
   ['should skip commented imports']: {
     options: { config },
     path: './src/pages/Page.ts',
