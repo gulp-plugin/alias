@@ -42,7 +42,7 @@ function findImports(line: string): string[] | null {
 function resolveImports(
   file: ReadonlyArray<string>,
   imports: FileData[],
-  options: ts.CompilerOptions
+  options: ts.CompilerOptions & { cwd: string }
 ): string[] {
   const { baseUrl, paths, cwd } = options
 
@@ -141,8 +141,6 @@ const alias: AliasPlugin = ({ config, cwd }: PluginOptions) => {
     compilerOptions.baseUrl = './'
   }
 
-  compilerOptions.cwd = cwd
-
   return new Transform({
     objectMode: true,
     transform(file: File, encoding: BufferEncoding, callback: TransformCallback) {
@@ -168,7 +166,7 @@ const alias: AliasPlugin = ({ config, cwd }: PluginOptions) => {
         return callback(undefined, file)
       }
 
-      const resolved = resolveImports(lines, imports, compilerOptions)
+      const resolved = resolveImports(lines, imports, { ...compilerOptions, cwd })
 
       file.contents = Buffer.from(resolved.join('\n'))
 
