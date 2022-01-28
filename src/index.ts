@@ -90,7 +90,12 @@ function resolveImports(
     const current = path.relative(base, path.dirname(imported.path))
     const target = path.relative(base, resolved)
 
-    const relative = path.relative(current, target).replace(/\\/g, '/')
+    let relative = path.relative(current, target).replace(/\\/g, '/')
+    if (!relative.startsWith('..')) {
+      // https://github.com/gulp-plugin/alias/issues/404
+      // in the some folder or the sub folder
+      relative = './' + relative
+    }
 
     lines[imported.index] = line.replace(imported.import, relative)
   }
