@@ -1,6 +1,8 @@
 import path from 'path'
 import { TransformCallback, Transform } from 'stream'
 import ts from 'typescript'
+import fs from 'fs'
+import { builtinModules } from 'module'
 
 import File = require('vinyl')
 
@@ -42,12 +44,15 @@ function findImports(line: string): string[] | null {
 function resolveImports(
   file: ReadonlyArray<string>,
   imports: FileData[],
-  options: ts.CompilerOptions
+  options: ts.CompilerOptions,
+  nodeModules: string[]
 ): string[] {
   const { baseUrl, paths, cwd } = options
 
+  const base = path.join(cwd as string, path.relative(cwd as string, baseUrl || './'))
+
   const aliases: { [key: string]: string[] | undefined } = {}
-  for (const alias in paths) {
+  for (const alias in paths || {}) {
     /* istanbul ignore else  */
     if (paths.hasOwnProperty(alias)) {
       let resolved = alias
@@ -82,11 +87,17 @@ function resolveImports(
       }
     }
 
+    if (resolved.length < 1 && /^\w/.test(imported.import) && !paths) {
+      const dirName = imported.import.split('/')[0]
+      if (!nodeModules.includes(dirName) && !builtinModules.includes(dirName)) {
+        resolved = path.join(base, './' + imported.import)
+      }
+    }
+
     if (resolved.length < 1) {
       continue
     }
 
-    const base = path.join(cwd as string, path.relative(cwd as string, baseUrl || './'))
     const current = path.relative(base, path.dirname(imported.path))
     const target = path.relative(base, resolved)
 
@@ -133,12 +144,19 @@ const alias: AliasPlugin = ({ config, cwd }: PluginOptions) => {
 
   const compilerOptions = resolveConfig(config, cwd)
 
-  if (!compilerOptions.paths) {
-    throw new Error("Unable to find the 'paths' property in the supplied configuration!")
+  if (!compilerOptions.paths && !compilerOptions.baseUrl) {
+    throw new Error(
+      "Unable to find the 'paths' or 'baseUrl' property in the supplied configuration!"
+    )
   }
 
   if (compilerOptions.baseUrl === undefined || compilerOptions.baseUrl === '.') {
     compilerOptions.baseUrl = './'
+  }
+
+  let nodeModules: string[] = []
+  if (!compilerOptions.paths && compilerOptions.baseUrl) {
+    nodeModules = fs.readdirSync(path.join(cwd, 'node_modules'))
   }
 
   compilerOptions.cwd = cwd
@@ -168,7 +186,7 @@ const alias: AliasPlugin = ({ config, cwd }: PluginOptions) => {
         return callback(undefined, file)
       }
 
-      const resolved = resolveImports(lines, imports, compilerOptions)
+      const resolved = resolveImports(lines, imports, compilerOptions, nodeModules)
 
       file.contents = Buffer.from(resolved.join('\n'))
 

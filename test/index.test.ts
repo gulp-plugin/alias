@@ -134,9 +134,9 @@ const tests: Record<string, Test> = {
     error: "Could not find a valid 'tsconfig.json'",
   },
   ["should error with no 'paths' in config"]: {
-    options: { config: { ...config, paths: undefined } },
+    options: { config: { paths: undefined, baseUrl: undefined } },
     path: './src/pages/Page.ts',
-    error: "Unable to find the 'paths' property in the supplied configuration!",
+    error: "Unable to find the 'paths' or 'baseUrl' property in the supplied configuration!",
   },
   ["should error with no 'path' supplied"]: {
     options: { config },
@@ -144,6 +144,24 @@ const tests: Record<string, Test> = {
     input: '',
     output: '',
     error: 'Received file with no path. Files must have path to be resolved.',
+  },
+  ['should replace to relative path when config with baseUrl but without Paths']: {
+    options: { config: { baseUrl: './src' } },
+    path: './src/pages/Page.ts',
+    input: "import {Grid} from 'components/grid'",
+    output: "import {Grid} from '../components/grid'",
+  },
+  ['should ignore node module']: {
+    options: { config: { baseUrl: './src' } },
+    path: './src/pages/Page.ts',
+    input: "import File from 'vinyl'",
+    output: "import File from 'vinyl'",
+  },
+  ['should ignore builtin module']: {
+    options: { config: { baseUrl: './src' } },
+    path: './src/pages/Page.ts',
+    input: "import assert from 'assert'",
+    output: "import assert from 'assert'",
   },
 }
 
